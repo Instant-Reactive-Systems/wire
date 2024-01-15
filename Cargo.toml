@@ -1,0 +1,12 @@
+[package]
+name = "wire"
+edition = "2021"
+version = "0.1.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+wire-macros = { path = "wire-macros" }
+thiserror = "1.0"
+bincode = { version = "2.0.0-rc.3", default-features = false, features = ["std", "derive"] }
+bevy_ecs = { version = "0.12", default-features = false, features = ["bevy_reflect"] }
