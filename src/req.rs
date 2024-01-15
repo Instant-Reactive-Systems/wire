@@ -80,7 +80,7 @@ where
 		f.debug_struct("Req")
 			.field("from", &self.from)
 			.field("action", &self.action)
-			.field("correlation_id", &self.corrid)
+			.field("corrid", &self.corrid)
 			.finish()
 	}
 }
