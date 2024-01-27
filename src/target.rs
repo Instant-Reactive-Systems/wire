@@ -1,6 +1,7 @@
 //! Module containing the target types.
 
 use bincode::{Decode, Encode};
+use serde::{Serialize, Deserialize};
 
 /// The user ID type.
 pub type UserId = i64;
@@ -16,7 +17,7 @@ pub const ANON_USER_ID: UserId = -1;
 pub const SYSTEM_USER_ID: UserId = -2;
 
 /// An enum representing an authenticated target.
-#[derive(bevy_ecs::prelude::Event, Encode, Decode, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(bevy_ecs::prelude::Event, Encode, Decode, Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum AuthTarget {
 	/// Targets all sessions of a user.
 	All(UserId),
@@ -43,7 +44,7 @@ impl Into<Target> for AuthTarget {
 /// An enum representing a target.
 ///
 /// A target can be either a source or a destination of a particular message.
-#[derive(bevy_ecs::prelude::Event, Encode, Decode, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(bevy_ecs::prelude::Event, Encode, Decode, Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Target {
 	/// Targets an anonymous session.
 	Anon(SessionId),
@@ -145,7 +146,7 @@ impl Into<Targets> for Vec<AuthTarget> {
 }
 
 /// The targets that a message can be sent to.
-#[derive(bevy_ecs::prelude::Event, Encode, Decode, Debug, Clone, PartialEq, Eq)]
+#[derive(bevy_ecs::prelude::Event, Encode, Decode, Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
 pub enum Targets {
 	/// Targets all sessions.
 	All,

@@ -1,10 +1,12 @@
 //! Common utilities for responses.
 
 use bincode::{Decode, Encode};
+use serde::{Serialize, Deserialize};
 
 use crate::Targets;
 
 /// An event that occurred in the system directed towards a particular [`Targets`].
+#[derive(Serialize, Deserialize)]
 pub struct Res<E> {
 	/// The targets that this event is sent to.
 	pub targets: Targets,

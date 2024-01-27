@@ -1,10 +1,12 @@
 //! Common utilities for requests.
 
 use bincode::{Decode, Encode};
+use serde::{Serialize, Deserialize};
 
 use crate::*;
 
 /// A request by a target (anonymous or authenticated) to perform an action.
+#[derive(Serialize, Deserialize)]
 pub struct Req<A> {
 	/// The target that sent the request.
 	pub from: Target,

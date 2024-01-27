@@ -1,13 +1,14 @@
 //! Common utilities for errors.
 
 use bincode::{Decode, Encode};
+use serde::{Serialize, Deserialize};
 
 use crate::Target;
 
 /// An error directed to a specific target.
 ///
 /// Uses a correlation ID to correlate the error to a request.
-#[derive(thiserror::Error, Debug)]
+#[derive(thiserror::Error, Debug, Serialize, Deserialize)]
 #[error("error '{error}' directed to player '{to:?}'")]
 pub struct Error<E> {
 	/// The target.
@@ -102,7 +103,7 @@ impl<E> Into<Vec<Error<E>>> for Error<E> {
 /// 	// ... other variants
 /// }
 /// ```
-#[derive(thiserror::Error, bevy_ecs::prelude::Event, Encode, Decode, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(thiserror::Error, bevy_ecs::prelude::Event, Encode, Decode, Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SessionError {
 	/// The maximum number of sessions reached.
 	#[error("maximum number of sessions reached")]
@@ -129,7 +130,7 @@ pub enum SessionError {
 /// 	// ... other variants
 /// }
 /// ```
-#[derive(thiserror::Error, bevy_ecs::prelude::Event, Encode, Decode, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(thiserror::Error, bevy_ecs::prelude::Event, Encode, Decode, Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum NetworkError {
 	/// The user has been rate-limited.
 	#[error("user has been rate-limited")]
