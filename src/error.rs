@@ -106,13 +106,13 @@ impl<E> Into<Vec<Error<E>>> for Error<E> {
 #[derive(thiserror::Error, bevy_ecs::prelude::Event, Encode, Decode, Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum SessionError {
 	/// The maximum number of sessions reached.
-	#[error("maximum number of sessions reached")]
+	#[error("err-wire-session-max-reached")]
 	MaximumSessionsReached,
 	/// The session does not exist.
-	#[error("session does not exist")]
+	#[error("err-wire-session-no-such")]
 	NoSuchSession,
 	/// The user is not authenticated.
-	#[error("user is not authenticated")]
+	#[error("err-wire-session-unauth")]
 	Unauthenticated,
 }
 
@@ -133,9 +133,9 @@ pub enum SessionError {
 #[derive(thiserror::Error, bevy_ecs::prelude::Event, Encode, Decode, Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum NetworkError {
 	/// The user has been rate-limited.
-	#[error("user has been rate-limited")]
+	#[error("err-wire-network-rate-limited")]
 	RateLimited,
 	/// Invalid message received.
-	#[error("invalid message received")]
+	#[error("err-wire-network-invalid-msg")]
 	InvalidMessage,
 }
