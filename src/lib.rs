@@ -15,6 +15,13 @@
 //! ```
 //!
 //! [`bevy`]: https://bevyengine.org
+//!
+//! # Fluent i18n
+//! `wire` exports a couple of common error types which use [`project-fluent`] as a
+//! way of specifying locales, therefore it exports its translations via [`fluent-templates`].
+//!
+//! [`project-fluent`]: https://projectfluent.org
+//! [`fluent-templates`]: https://github.com/XAMPPRocky/fluent-templates
 
 pub mod error;
 pub use error::{Error, NetworkError, SessionError};
@@ -31,6 +38,9 @@ pub use res::Res;
 pub mod target;
 pub use target::{AuthTarget, SessionId, Target, Targets, UserId, ANON_USER_ID, SYSTEM_USER_ID};
 pub use wire_macros::WireObj;
+
+#[cfg(feature = "i18n")]
+pub mod i18n;
 
 #[cfg(test)]
 mod tests {
