@@ -1,23 +1,15 @@
 //! Module containing the target types.
 
-use bincode::{Decode, Encode};
-use serde::{Serialize, Deserialize};
-
 /// The user ID type.
-pub type UserId = i64;
+pub type UserId = uuid::Uuid;
 /// The session ID type.
 pub type SessionId = u32;
 /// The user ID of an anonymous target.
-pub const ANON_USER_ID: UserId = -1;
-/// The user ID of a system target.
-///
-/// System targets are internal target within the network that
-/// are not associated with any particular user and are usually safe
-/// to treat as authenticated and having maximum permissions.
-pub const SYSTEM_USER_ID: UserId = -2;
+pub const ANON_USER_ID: UserId = uuid::Uuid::nil();
 
 /// An enum representing an authenticated target.
-#[derive(bevy_ecs::prelude::Event, Encode, Decode, Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(bevy_ecs::prelude::Event, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum AuthTarget {
 	/// Targets all sessions of a user.
 	All(UserId),
@@ -41,10 +33,79 @@ impl Into<Target> for AuthTarget {
 	}
 }
 
+#[cfg(feature = "bincode")]
+impl bincode::Encode for AuthTarget {
+	fn encode<E: bincode::enc::Encoder>(&self, encoder: &mut E) -> Result<(), bincode::error::EncodeError> {
+		match self {
+			AuthTarget::All(user_id) => {
+				0.encode(encoder)?;
+				user_id.as_bytes().encode(encoder)
+			},
+			AuthTarget::Specific(user_id, session_id) => {
+				1.encode(encoder)?;
+				user_id.as_bytes().encode(encoder)?;
+				session_id.encode(encoder)
+			},
+		}
+	}
+}
+
+#[cfg(feature = "bincode")]
+impl bincode::Decode for AuthTarget {
+	fn decode<D: bincode::de::Decoder>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
+		let arm = u8::decode(decoder)?;
+		match arm {
+			0 => {
+				let user_id = <[u8; 16]>::decode(decoder)?;
+				let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
+				Ok(AuthTarget::All(user_id))
+			},
+			1 => {
+				let user_id = <[u8; 16]>::decode(decoder)?;
+				let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
+				let session_id = SessionId::decode(decoder)?;
+				Ok(AuthTarget::Specific(user_id, session_id))
+			},
+			_ => Err(bincode::error::DecodeError::UnexpectedVariant {
+				type_name: std::any::type_name::<AuthTarget>(),
+				allowed: &bincode::error::AllowedEnumVariants::Range { min: 0, max: 1 },
+				found: arm as u32,
+			}),
+		}
+	}
+}
+
+#[cfg(feature = "bincode")]
+impl<'de> bincode::BorrowDecode<'de> for AuthTarget {
+	fn borrow_decode<D: bincode::de::BorrowDecoder<'de>>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
+		let arm = u8::borrow_decode(decoder)?;
+		match arm {
+			0 => {
+				let user_id = <[u8; 16]>::borrow_decode(decoder)?;
+				let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
+				Ok(AuthTarget::All(user_id))
+			},
+			1 => {
+				let user_id = <[u8; 16]>::borrow_decode(decoder)?;
+				let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
+				let session_id = SessionId::borrow_decode(decoder)?;
+				Ok(AuthTarget::Specific(user_id, session_id))
+			},
+			_ => Err(bincode::error::DecodeError::UnexpectedVariant {
+				type_name: std::any::type_name::<AuthTarget>(),
+				allowed: &bincode::error::AllowedEnumVariants::Range { min: 0, max: 1 },
+				found: arm as u32,
+			}),
+		}
+	}
+}
+
 /// An enum representing a target.
 ///
 /// A target can be either a source or a destination of a particular message.
-#[derive(bevy_ecs::prelude::Event, Encode, Decode, Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(bevy_ecs::prelude::Event, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Target {
 	/// Targets an anonymous session.
 	Anon(SessionId),
@@ -85,15 +146,6 @@ impl Target {
 	pub fn is_anon(&self) -> bool {
 		match self {
 			Self::Anon(_) => true,
-			_ => false,
-		}
-	}
-
-	/// Checks whether the target is a system target.
-	pub fn is_system(&self) -> bool {
-		match self {
-			Self::Auth(AuthTarget::All(SYSTEM_USER_ID)) => true,
-			Self::Auth(AuthTarget::Specific(SYSTEM_USER_ID, _)) => true,
 			_ => false,
 		}
 	}
@@ -146,7 +198,9 @@ impl Into<Targets> for Vec<AuthTarget> {
 }
 
 /// The targets that a message can be sent to.
-#[derive(bevy_ecs::prelude::Event, Encode, Decode, Serialize, Deserialize, Debug, Clone, PartialEq, Eq)]
+#[derive(bevy_ecs::prelude::Event, Debug, Clone, PartialEq, Eq)]
+#[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum Targets {
 	/// Targets all sessions.
 	All,

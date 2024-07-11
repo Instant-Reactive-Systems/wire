@@ -1,14 +1,12 @@
 //! Common utilities for errors.
 
-use bincode::{Decode, Encode};
-use serde::{Serialize, Deserialize};
-
 use crate::Target;
 
 /// An error directed to a specific target.
 ///
 /// Uses a correlation ID to correlate the error to a request.
-#[derive(thiserror::Error, Debug, Serialize, Deserialize)]
+#[derive(thiserror::Error, Debug)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 #[error("error '{error}' directed to player '{to:?}'")]
 pub struct Error<E> {
 	/// The target.
@@ -23,7 +21,7 @@ impl<E> bevy_ecs::event::Event for Error<E> where E: bevy_ecs::event::Event {}
 
 impl<E> Error<E>
 where
-	E: std::error::Error + std::fmt::Debug + Encode + Decode + Clone + PartialEq,
+	E: std::error::Error + std::fmt::Debug + Clone + PartialEq,
 {
 	/// Creates a new directed error.
 	pub fn new(to: impl Into<Target>, error: impl Into<E>, corrid: u64) -> Self {
@@ -35,9 +33,10 @@ where
 	}
 }
 
-impl<E> Encode for Error<E>
+#[cfg(feature = "bincode")]
+impl<E> bincode::Encode for Error<E>
 where
-	E: Encode,
+	E: bincode::Encode,
 {
 	fn encode<Enc: bincode::enc::Encoder>(&self, encoder: &mut Enc) -> Result<(), bincode::error::EncodeError> {
 		self.to.encode(encoder)?;
@@ -46,9 +45,10 @@ where
 	}
 }
 
-impl<E> Decode for Error<E>
+#[cfg(feature = "bincode")]
+impl<E> bincode::Decode for Error<E>
 where
-	E: Decode,
+	E: bincode::Decode,
 {
 	fn decode<D: bincode::de::Decoder>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
 		Ok(Self {
@@ -95,15 +95,16 @@ impl<E> Into<Vec<Error<E>>> for Error<E> {
 /// Use as a transparent variant in custom errors.
 ///
 /// ```
-/// # use bincode::{Encode, Decode};
-/// #[derive(thiserror::Error)]
+/// #[derive(thiserror::Error, Debug)]
 /// pub enum MyError {
 /// 	#[error(transparent)]
 /// 	Session(#[from] wire::SessionError),
 /// 	// ... other variants
 /// }
 /// ```
-#[derive(thiserror::Error, bevy_ecs::prelude::Event, Encode, Decode, Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(thiserror::Error, bevy_ecs::prelude::Event, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SessionError {
 	/// The maximum number of sessions reached.
 	#[error("wire-err-max_reached")]
@@ -122,15 +123,16 @@ pub enum SessionError {
 /// Use as a transparent variant in custom errors.
 ///
 /// ```
-/// # use bincode::{Encode, Decode};
-/// #[derive(thiserror::Error)]
+/// #[derive(thiserror::Error, Debug)]
 /// pub enum MyError {
 /// 	#[error(transparent)]
 /// 	Network(#[from] wire::NetworkError),
 /// 	// ... other variants
 /// }
 /// ```
-#[derive(thiserror::Error, bevy_ecs::prelude::Event, Encode, Decode, Serialize, Deserialize, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(thiserror::Error, bevy_ecs::prelude::Event, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum NetworkError {
 	/// The user has been rate-limited.
 	#[error("wire-err-rate_limited")]

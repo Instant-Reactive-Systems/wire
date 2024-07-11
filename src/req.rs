@@ -1,12 +1,9 @@
 //! Common utilities for requests.
 
-use bincode::{Decode, Encode};
-use serde::{Serialize, Deserialize};
-
 use crate::*;
 
 /// A request by a target (anonymous or authenticated) to perform an action.
-#[derive(Serialize, Deserialize)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Req<A> {
 	/// The target that sent the request.
 	pub from: Target,
@@ -29,9 +26,10 @@ impl<A> Req<A> {
 
 impl<A> bevy_ecs::event::Event for Req<A> where A: bevy_ecs::event::Event {}
 
-impl<A> Encode for Req<A>
+#[cfg(feature = "bincode")]
+impl<A> bincode::Encode for Req<A>
 where
-	A: Encode,
+	A: bincode::Encode,
 {
 	fn encode<E: bincode::enc::Encoder>(&self, encoder: &mut E) -> Result<(), bincode::error::EncodeError> {
 		self.from.encode(encoder)?;
@@ -39,9 +37,10 @@ where
 	}
 }
 
-impl<A> Decode for Req<A>
+#[cfg(feature = "bincode")]
+impl<A> bincode::Decode for Req<A>
 where
-	A: Decode,
+	A: bincode::Decode,
 {
 	fn decode<D: bincode::de::Decoder>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
 		Ok(Self {

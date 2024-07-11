@@ -36,7 +36,7 @@ pub mod res;
 pub use res::Res;
 
 pub mod target;
-pub use target::{AuthTarget, SessionId, Target, Targets, UserId, ANON_USER_ID, SYSTEM_USER_ID};
+pub use target::{AuthTarget, SessionId, Target, Targets, UserId, ANON_USER_ID};
 pub use wire_macros::WireObj;
 
 #[cfg(feature = "i18n")]

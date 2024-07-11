@@ -1,11 +1,9 @@
 //! Common events used by the server and/or client.
 
-use bincode::{Decode, Encode};
-
 use crate::*;
 
 /// Event indicating a user connected to the server.
-/// 
+///
 /// It is generic to allow for muxing into different handlers.
 pub struct Connected<M> {
 	/// The user id of the user.
@@ -28,18 +26,37 @@ impl<M> Connected<M> {
 
 impl<M> bevy_ecs::event::Event for Connected<M> where M: bevy_ecs::event::Event {}
 
-impl<M> Encode for Connected<M> {
+#[cfg(feature = "bincode")]
+impl<M> bincode::Encode for Connected<M> {
 	fn encode<E: bincode::enc::Encoder>(&self, encoder: &mut E) -> Result<(), bincode::error::EncodeError> {
-		self.user_id.encode(encoder)?;
+		self.user_id.as_bytes().encode(encoder)?;
 		self.session_id.encode(encoder)
 	}
 }
 
-impl<M> Decode for Connected<M> {
+#[cfg(feature = "bincode")]
+impl<M> bincode::Decode for Connected<M> {
 	fn decode<D: bincode::de::Decoder>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
+		let user_id = <[u8; 16]>::decode(decoder)?;
+		let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
+
 		Ok(Self {
-			user_id: UserId::decode(decoder)?,
+			user_id,
 			session_id: SessionId::decode(decoder)?,
+			_phantom: Default::default(),
+		})
+	}
+}
+
+#[cfg(feature = "bincode")]
+impl<'de, M> bincode::BorrowDecode<'de> for Connected<M> {
+	fn borrow_decode<D: bincode::de::BorrowDecoder<'de>>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
+		let user_id = <[u8; 16]>::borrow_decode(decoder)?;
+		let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
+
+		Ok(Self {
+			user_id,
+			session_id: SessionId::borrow_decode(decoder)?,
 			_phantom: Default::default(),
 		})
 	}
@@ -62,7 +79,10 @@ impl<M> std::hash::Hash for Connected<M> {
 
 impl<M> std::fmt::Debug for Connected<M> {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		f.debug_struct("Connected").field("user_id", &self.user_id).field("session_id", &self.session_id).finish()
+		f.debug_struct("Connected")
+			.field("user_id", &self.user_id)
+			.field("session_id", &self.session_id)
+			.finish()
 	}
 }
 
@@ -79,7 +99,7 @@ impl<M> Clone for Connected<M> {
 impl<M> Copy for Connected<M> {}
 
 /// Event indicating a user disconnected from the server.
-/// 
+///
 /// It is generic to allow for muxing into different handlers.
 pub struct Disconnected<M> {
 	/// The user id of the user.
@@ -102,18 +122,37 @@ impl<M> Disconnected<M> {
 
 impl<M> bevy_ecs::event::Event for Disconnected<M> where M: bevy_ecs::event::Event {}
 
-impl<M> Encode for Disconnected<M> {
+#[cfg(feature = "bincode")]
+impl<M> bincode::Encode for Disconnected<M> {
 	fn encode<E: bincode::enc::Encoder>(&self, encoder: &mut E) -> Result<(), bincode::error::EncodeError> {
-		self.user_id.encode(encoder)?;
+		self.user_id.as_bytes().encode(encoder)?;
 		self.session_id.encode(encoder)
 	}
 }
 
-impl<M> Decode for Disconnected<M> {
+#[cfg(feature = "bincode")]
+impl<M> bincode::Decode for Disconnected<M> {
 	fn decode<D: bincode::de::Decoder>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
+		let user_id = <[u8; 16]>::decode(decoder)?;
+		let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
+
 		Ok(Self {
-			user_id: UserId::decode(decoder)?,
+			user_id,
 			session_id: SessionId::decode(decoder)?,
+			_phantom: Default::default(),
+		})
+	}
+}
+
+#[cfg(feature = "bincode")]
+impl<'de, M> bincode::BorrowDecode<'de> for Disconnected<M> {
+	fn borrow_decode<D: bincode::de::BorrowDecoder<'de>>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
+		let user_id = <[u8; 16]>::borrow_decode(decoder)?;
+		let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
+
+		Ok(Self {
+			user_id,
+			session_id: SessionId::borrow_decode(decoder)?,
 			_phantom: Default::default(),
 		})
 	}
@@ -136,7 +175,10 @@ impl<M> std::hash::Hash for Disconnected<M> {
 
 impl<M> std::fmt::Debug for Disconnected<M> {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		f.debug_struct("Disconnected").field("user_id", &self.user_id).field("session_id", &self.session_id).finish()
+		f.debug_struct("Disconnected")
+			.field("user_id", &self.user_id)
+			.field("session_id", &self.session_id)
+			.finish()
 	}
 }
 
@@ -153,7 +195,7 @@ impl<M> Clone for Disconnected<M> {
 impl<M> Copy for Disconnected<M> {}
 
 /// Event indicating a user connected to the server without having a previous session active.
-/// 
+///
 /// It is generic to allow for muxing into different handlers.
 pub struct FirstConnected<M> {
 	/// The user id of the user.
@@ -176,18 +218,37 @@ impl<M> FirstConnected<M> {
 
 impl<M> bevy_ecs::event::Event for FirstConnected<M> where M: bevy_ecs::event::Event {}
 
-impl<M> Encode for FirstConnected<M> {
+#[cfg(feature = "bincode")]
+impl<M> bincode::Encode for FirstConnected<M> {
 	fn encode<E: bincode::enc::Encoder>(&self, encoder: &mut E) -> Result<(), bincode::error::EncodeError> {
-		self.user_id.encode(encoder)?;
+		self.user_id.as_bytes().encode(encoder)?;
 		self.session_id.encode(encoder)
 	}
 }
 
-impl<M> Decode for FirstConnected<M> {
+#[cfg(feature = "bincode")]
+impl<M> bincode::Decode for FirstConnected<M> {
 	fn decode<D: bincode::de::Decoder>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
+		let user_id = <[u8; 16]>::decode(decoder)?;
+		let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
+
 		Ok(Self {
-			user_id: UserId::decode(decoder)?,
+			user_id,
 			session_id: SessionId::decode(decoder)?,
+			_phantom: Default::default(),
+		})
+	}
+}
+
+#[cfg(feature = "bincode")]
+impl<'de, M> bincode::BorrowDecode<'de> for FirstConnected<M> {
+	fn borrow_decode<D: bincode::de::BorrowDecoder<'de>>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
+		let user_id = <[u8; 16]>::borrow_decode(decoder)?;
+		let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
+
+		Ok(Self {
+			user_id,
+			session_id: SessionId::borrow_decode(decoder)?,
 			_phantom: Default::default(),
 		})
 	}
@@ -210,7 +271,10 @@ impl<M> std::hash::Hash for FirstConnected<M> {
 
 impl<M> std::fmt::Debug for FirstConnected<M> {
 	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		f.debug_struct("FirstConnected").field("user_id", &self.user_id).field("session_id", &self.session_id).finish()
+		f.debug_struct("FirstConnected")
+			.field("user_id", &self.user_id)
+			.field("session_id", &self.session_id)
+			.finish()
 	}
 }
 
