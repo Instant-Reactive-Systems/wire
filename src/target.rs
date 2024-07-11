@@ -125,6 +125,22 @@ impl Target {
 		}
 	}
 
+	/// Creates a [`Target`] from an automatically generated user ID and defaulted session ID (0).
+	///
+	/// Useful in cases of testing.
+	pub fn new_random() -> Self {
+		let user_id = uuid::Uuid::new_v4();
+		Self::Auth(AuthTarget::Specific(user_id, 0))
+	}
+
+	/// Creates a [`Target`] from an automatically generated user ID and a session ID.
+	///
+	/// Useful in cases of testing.
+	pub fn new_random_with_session(session_id: SessionId) -> Self {
+		let user_id = uuid::Uuid::new_v4();
+		Self::Auth(AuthTarget::Specific(user_id, session_id))
+	}
+
 	/// Checks whether the two targets are equal, allowing for same broader authenticated targets to also be equal.
 	pub fn weak_eq(&self, other: &Self) -> bool {
 		match (self, other) {
