@@ -15,7 +15,10 @@ fluent-templates = { version = "0.9", optional = true }
 uuid = { version = "1.10", default-features = false, features = ["v4"] }
 
 [features]
-i18n = ["dep:fluent-templates"]
-wasm = ["uuid/js"]
+# wire protocol
 bincode = ["dep:bincode"]
 serde = ["dep:serde"]
+# localization
+i18n = ["dep:fluent-templates"]
+# wasm
+wasm = ["uuid/js"]

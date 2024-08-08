@@ -29,7 +29,7 @@ impl<M> bevy_ecs::event::Event for Connected<M> where M: bevy_ecs::event::Event 
 #[cfg(feature = "bincode")]
 impl<M> bincode::Encode for Connected<M> {
 	fn encode<E: bincode::enc::Encoder>(&self, encoder: &mut E) -> Result<(), bincode::error::EncodeError> {
-		self.user_id.as_bytes().encode(encoder)?;
+		self.user_id.encode(encoder)?;
 		self.session_id.encode(encoder)
 	}
 }
@@ -37,11 +37,8 @@ impl<M> bincode::Encode for Connected<M> {
 #[cfg(feature = "bincode")]
 impl<M> bincode::Decode for Connected<M> {
 	fn decode<D: bincode::de::Decoder>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
-		let user_id = <[u8; 16]>::decode(decoder)?;
-		let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
-
 		Ok(Self {
-			user_id,
+			user_id: UserId::decode(decoder)?,
 			session_id: SessionId::decode(decoder)?,
 			_phantom: Default::default(),
 		})
@@ -51,11 +48,8 @@ impl<M> bincode::Decode for Connected<M> {
 #[cfg(feature = "bincode")]
 impl<'de, M> bincode::BorrowDecode<'de> for Connected<M> {
 	fn borrow_decode<D: bincode::de::BorrowDecoder<'de>>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
-		let user_id = <[u8; 16]>::borrow_decode(decoder)?;
-		let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
-
 		Ok(Self {
-			user_id,
+			user_id: UserId::borrow_decode(decoder)?,
 			session_id: SessionId::borrow_decode(decoder)?,
 			_phantom: Default::default(),
 		})
@@ -125,7 +119,7 @@ impl<M> bevy_ecs::event::Event for Disconnected<M> where M: bevy_ecs::event::Eve
 #[cfg(feature = "bincode")]
 impl<M> bincode::Encode for Disconnected<M> {
 	fn encode<E: bincode::enc::Encoder>(&self, encoder: &mut E) -> Result<(), bincode::error::EncodeError> {
-		self.user_id.as_bytes().encode(encoder)?;
+		self.user_id.encode(encoder)?;
 		self.session_id.encode(encoder)
 	}
 }
@@ -133,11 +127,8 @@ impl<M> bincode::Encode for Disconnected<M> {
 #[cfg(feature = "bincode")]
 impl<M> bincode::Decode for Disconnected<M> {
 	fn decode<D: bincode::de::Decoder>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
-		let user_id = <[u8; 16]>::decode(decoder)?;
-		let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
-
 		Ok(Self {
-			user_id,
+			user_id: UserId::decode(decoder)?,
 			session_id: SessionId::decode(decoder)?,
 			_phantom: Default::default(),
 		})
@@ -147,11 +138,8 @@ impl<M> bincode::Decode for Disconnected<M> {
 #[cfg(feature = "bincode")]
 impl<'de, M> bincode::BorrowDecode<'de> for Disconnected<M> {
 	fn borrow_decode<D: bincode::de::BorrowDecoder<'de>>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
-		let user_id = <[u8; 16]>::borrow_decode(decoder)?;
-		let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
-
 		Ok(Self {
-			user_id,
+			user_id: UserId::borrow_decode(decoder)?,
 			session_id: SessionId::borrow_decode(decoder)?,
 			_phantom: Default::default(),
 		})
@@ -221,7 +209,7 @@ impl<M> bevy_ecs::event::Event for FirstConnected<M> where M: bevy_ecs::event::E
 #[cfg(feature = "bincode")]
 impl<M> bincode::Encode for FirstConnected<M> {
 	fn encode<E: bincode::enc::Encoder>(&self, encoder: &mut E) -> Result<(), bincode::error::EncodeError> {
-		self.user_id.as_bytes().encode(encoder)?;
+		self.user_id.encode(encoder)?;
 		self.session_id.encode(encoder)
 	}
 }
@@ -229,11 +217,8 @@ impl<M> bincode::Encode for FirstConnected<M> {
 #[cfg(feature = "bincode")]
 impl<M> bincode::Decode for FirstConnected<M> {
 	fn decode<D: bincode::de::Decoder>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
-		let user_id = <[u8; 16]>::decode(decoder)?;
-		let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
-
 		Ok(Self {
-			user_id,
+			user_id: UserId::decode(decoder)?,
 			session_id: SessionId::decode(decoder)?,
 			_phantom: Default::default(),
 		})
@@ -243,11 +228,8 @@ impl<M> bincode::Decode for FirstConnected<M> {
 #[cfg(feature = "bincode")]
 impl<'de, M> bincode::BorrowDecode<'de> for FirstConnected<M> {
 	fn borrow_decode<D: bincode::de::BorrowDecoder<'de>>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
-		let user_id = <[u8; 16]>::borrow_decode(decoder)?;
-		let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
-
 		Ok(Self {
-			user_id,
+			user_id: UserId::borrow_decode(decoder)?,
 			session_id: SessionId::borrow_decode(decoder)?,
 			_phantom: Default::default(),
 		})

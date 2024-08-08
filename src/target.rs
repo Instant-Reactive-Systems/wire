@@ -1,14 +1,65 @@
 //! Module containing the target types.
 
+/// A wrapper around a Uuid providing bincode support.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+pub struct Uuid(uuid::Uuid);
+
+impl Uuid {
+	/// A nil uuid.
+	pub const fn nil() -> Self {
+		Self(uuid::Uuid::nil())
+	}
+
+	/// Generates a new random uuidv4.
+	pub fn new_random() -> Self {
+		Self(uuid::Uuid::new_v4())
+	}
+}
+
+impl std::fmt::Display for UserId {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		self.0.as_hyphenated().fmt(f)
+	}
+}
+
+#[cfg(feature = "bincode")]
+impl bincode::Encode for UserId {
+	fn encode<E: bincode::enc::Encoder>(&self, encoder: &mut E) -> Result<(), bincode::error::EncodeError> {
+		self.0.as_bytes().encode(encoder)
+	}
+}
+
+#[cfg(feature = "bincode")]
+impl bincode::Decode for UserId {
+	fn decode<D: bincode::de::Decoder>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
+		let user_id = <[u8; 16]>::decode(decoder)?;
+		let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
+		Ok(Self(user_id))
+	}
+}
+
+#[cfg(feature = "bincode")]
+impl<'de> bincode::BorrowDecode<'de> for UserId {
+	fn borrow_decode<D: bincode::de::BorrowDecoder<'de>>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
+		let user_id = <[u8; 16]>::borrow_decode(decoder)?;
+		let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
+		Ok(Self(user_id))
+	}
+}
+
 /// The user ID type.
-pub type UserId = uuid::Uuid;
+pub type UserId = Uuid;
 /// The session ID type.
 pub type SessionId = u32;
+/// The correlation ID type.
+pub type CorrelationId = Uuid;
 /// The user ID of an anonymous target.
-pub const ANON_USER_ID: UserId = uuid::Uuid::nil();
+pub const ANON_USER_ID: UserId = UserId::nil();
 
 /// An enum representing an authenticated target.
 #[derive(bevy_ecs::prelude::Event, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum AuthTarget {
 	/// Targets all sessions of a user.
@@ -30,73 +81,6 @@ impl AuthTarget {
 impl Into<Target> for AuthTarget {
 	fn into(self) -> Target {
 		Target::Auth(self)
-	}
-}
-
-#[cfg(feature = "bincode")]
-impl bincode::Encode for AuthTarget {
-	fn encode<E: bincode::enc::Encoder>(&self, encoder: &mut E) -> Result<(), bincode::error::EncodeError> {
-		match self {
-			AuthTarget::All(user_id) => {
-				0.encode(encoder)?;
-				user_id.as_bytes().encode(encoder)
-			},
-			AuthTarget::Specific(user_id, session_id) => {
-				1.encode(encoder)?;
-				user_id.as_bytes().encode(encoder)?;
-				session_id.encode(encoder)
-			},
-		}
-	}
-}
-
-#[cfg(feature = "bincode")]
-impl bincode::Decode for AuthTarget {
-	fn decode<D: bincode::de::Decoder>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
-		let arm = u8::decode(decoder)?;
-		match arm {
-			0 => {
-				let user_id = <[u8; 16]>::decode(decoder)?;
-				let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
-				Ok(AuthTarget::All(user_id))
-			},
-			1 => {
-				let user_id = <[u8; 16]>::decode(decoder)?;
-				let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
-				let session_id = SessionId::decode(decoder)?;
-				Ok(AuthTarget::Specific(user_id, session_id))
-			},
-			_ => Err(bincode::error::DecodeError::UnexpectedVariant {
-				type_name: std::any::type_name::<AuthTarget>(),
-				allowed: &bincode::error::AllowedEnumVariants::Range { min: 0, max: 1 },
-				found: arm as u32,
-			}),
-		}
-	}
-}
-
-#[cfg(feature = "bincode")]
-impl<'de> bincode::BorrowDecode<'de> for AuthTarget {
-	fn borrow_decode<D: bincode::de::BorrowDecoder<'de>>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
-		let arm = u8::borrow_decode(decoder)?;
-		match arm {
-			0 => {
-				let user_id = <[u8; 16]>::borrow_decode(decoder)?;
-				let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
-				Ok(AuthTarget::All(user_id))
-			},
-			1 => {
-				let user_id = <[u8; 16]>::borrow_decode(decoder)?;
-				let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
-				let session_id = SessionId::borrow_decode(decoder)?;
-				Ok(AuthTarget::Specific(user_id, session_id))
-			},
-			_ => Err(bincode::error::DecodeError::UnexpectedVariant {
-				type_name: std::any::type_name::<AuthTarget>(),
-				allowed: &bincode::error::AllowedEnumVariants::Range { min: 0, max: 1 },
-				found: arm as u32,
-			}),
-		}
 	}
 }
 
@@ -129,7 +113,7 @@ impl Target {
 	///
 	/// Useful in cases of testing.
 	pub fn new_random() -> Self {
-		let user_id = uuid::Uuid::new_v4();
+		let user_id = UserId::new_random();
 		Self::Auth(AuthTarget::Specific(user_id, 0))
 	}
 
@@ -137,7 +121,7 @@ impl Target {
 	///
 	/// Useful in cases of testing.
 	pub fn new_random_with_session(session_id: SessionId) -> Self {
-		let user_id = uuid::Uuid::new_v4();
+		let user_id = UserId::new_random();
 		Self::Auth(AuthTarget::Specific(user_id, session_id))
 	}
 

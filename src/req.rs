@@ -3,6 +3,7 @@
 use crate::*;
 
 /// A request by a target (anonymous or authenticated) to perform an action.
+#[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Req<A> {
 	/// The target that sent the request.
@@ -10,12 +11,12 @@ pub struct Req<A> {
 	/// The action that the target wants to perform.
 	pub action: A,
 	/// The correlation ID of the request.
-	pub corrid: u64,
+	pub corrid: CorrelationId,
 }
 
 impl<A> Req<A> {
 	/// Creates a new request.
-	pub fn new(from: impl Into<Target>, action: impl Into<A>, corrid: u64) -> Self {
+	pub fn new(from: impl Into<Target>, action: impl Into<A>, corrid: CorrelationId) -> Self {
 		Self {
 			from: from.into(),
 			action: action.into(),
@@ -25,31 +26,6 @@ impl<A> Req<A> {
 }
 
 impl<A> bevy_ecs::event::Event for Req<A> where A: bevy_ecs::event::Event {}
-
-#[cfg(feature = "bincode")]
-impl<A> bincode::Encode for Req<A>
-where
-	A: bincode::Encode,
-{
-	fn encode<E: bincode::enc::Encoder>(&self, encoder: &mut E) -> Result<(), bincode::error::EncodeError> {
-		self.from.encode(encoder)?;
-		self.action.encode(encoder)
-	}
-}
-
-#[cfg(feature = "bincode")]
-impl<A> bincode::Decode for Req<A>
-where
-	A: bincode::Decode,
-{
-	fn decode<D: bincode::de::Decoder>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
-		Ok(Self {
-			from: Target::decode(decoder)?,
-			action: A::decode(decoder)?,
-			corrid: u64::decode(decoder)?,
-		})
-	}
-}
 
 impl<A> PartialEq for Req<A>
 where

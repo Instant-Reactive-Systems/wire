@@ -3,6 +3,7 @@
 use crate::Targets;
 
 /// An event that occurred in the system directed towards a particular [`Targets`].
+#[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Res<E> {
 	/// The targets that this event is sent to.
@@ -22,30 +23,6 @@ impl<E> Res<E> {
 }
 
 impl<E> bevy_ecs::event::Event for Res<E> where E: bevy_ecs::event::Event {}
-
-#[cfg(feature = "bincode")]
-impl<E> bincode::Encode for Res<E>
-where
-	E: bincode::Encode,
-{
-	fn encode<Enc: bincode::enc::Encoder>(&self, encoder: &mut Enc) -> Result<(), bincode::error::EncodeError> {
-		self.targets.encode(encoder)?;
-		self.event.encode(encoder)
-	}
-}
-
-#[cfg(feature = "bincode")]
-impl<E> bincode::Decode for Res<E>
-where
-	E: bincode::Decode,
-{
-	fn decode<Dec: bincode::de::Decoder>(decoder: &mut Dec) -> Result<Self, bincode::error::DecodeError> {
-		Ok(Self {
-			targets: Targets::decode(decoder)?,
-			event: E::decode(decoder)?,
-		})
-	}
-}
 
 impl<E> PartialEq for Res<E>
 where
