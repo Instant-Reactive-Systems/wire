@@ -115,4 +115,7 @@ pub enum NetworkError {
 	/// Invalid message received.
 	#[error("wire-err-invalid_msg")]
 	InvalidMessage,
+	/// Socket error.
+	#[error("wire-err-socket_error")]
+	SocketError,
 }
