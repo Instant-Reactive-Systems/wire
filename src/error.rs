@@ -77,7 +77,7 @@ impl<E> Into<Vec<Error<E>>> for Error<E> {
 /// 	// ... other variants
 /// }
 /// ```
-#[derive(thiserror::Error, bevy_ecs::prelude::Event, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(thiserror::Error, bevy_ecs::prelude::Event, Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum SessionError {
@@ -105,7 +105,7 @@ pub enum SessionError {
 /// 	// ... other variants
 /// }
 /// ```
-#[derive(thiserror::Error, bevy_ecs::prelude::Event, Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(thiserror::Error, bevy_ecs::prelude::Event, Debug, Clone, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub enum NetworkError {
@@ -117,5 +117,5 @@ pub enum NetworkError {
 	InvalidMessage,
 	/// Socket error.
 	#[error("wire-err-socket_error")]
-	SocketError,
+	SocketError(String),
 }

@@ -7,3 +7,4 @@ wire-err-unauth = Niste ulogirani
 # network errors
 wire-err-rate_limited = Vaše radnje su ograničene brzinom
 wire-err-invalid_msg = Poruka nije validna
+wire-err-socket_error = Greška na socketu: {$what}
