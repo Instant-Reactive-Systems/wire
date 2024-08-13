@@ -15,6 +15,11 @@ impl Uuid {
 	pub fn new_random() -> Self {
 		Self(uuid::Uuid::new_v4())
 	}
+
+	/// Creates a new specific uuidv4 from a u64 pair.
+	pub const fn from_u64_pair(high: u64, low: u64) -> Self {
+		Self(uuid::Uuid::from_u64_pair(high, low))
+	}
 }
 
 impl std::fmt::Display for UserId {
