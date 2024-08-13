@@ -212,3 +212,24 @@ pub enum Targets {
 	/// Targets only a set of specific targets.
 	Few(Vec<Target>),
 }
+
+/// An endless (u64-endless) pool of `Target`s.
+#[derive(Debug, Clone, Copy)]
+pub struct UserPool {
+	curr: u64,
+}
+
+impl UserPool {
+	/// Selects the next unique target from the user pool.
+	pub fn next(&mut self) -> Target {
+		let n = self.curr;
+		self.curr += 1;
+		Target::new(Uuid::from_u64_pair(n, n), 0)
+	}
+}
+
+impl Default for UserPool {
+	fn default() -> Self {
+		Self { curr: 0 }
+	}
+}
