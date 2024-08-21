@@ -2,6 +2,10 @@
 
 use crate::*;
 
+/// Marker type of a connection event that hasn't been mapped into any category yet.
+#[derive(bevy_ecs::prelude::Event, Debug, Clone, Copy)]
+pub struct Undetermined;
+
 /// Event indicating a user connected to the server.
 ///
 /// It is generic to allow for muxing into different handlers.
