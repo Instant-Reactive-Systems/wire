@@ -18,10 +18,7 @@ pub struct Error<E> {
 
 impl<E> bevy_ecs::event::Event for Error<E> where E: bevy_ecs::event::Event {}
 
-impl<E> Error<E>
-where
-	E: std::error::Error + std::fmt::Debug + Clone + PartialEq,
-{
+impl<E> Error<E> {
 	/// Creates a new directed error.
 	pub fn new(to: impl Into<Target>, error: impl Into<E>, corrid: CorrelationId) -> Self {
 		Self {
