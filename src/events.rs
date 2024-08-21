@@ -28,6 +28,8 @@ impl<M> Connected<M> {
 	}
 }
 
+impl<M> bevy_ecs::event::Event for Connected<M> where M: bevy_ecs::event::Event {}
+
 impl<M> PartialEq for Connected<M> {
 	fn eq(&self, other: &Self) -> bool {
 		self.user_id == other.user_id && self.session_id == other.session_id
@@ -86,6 +88,8 @@ impl<M> Disconnected<M> {
 	}
 }
 
+impl<M> bevy_ecs::event::Event for Disconnected<M> where M: bevy_ecs::event::Event {}
+
 impl<M> PartialEq for Disconnected<M> {
 	fn eq(&self, other: &Self) -> bool {
 		self.user_id == other.user_id && self.session_id == other.session_id
@@ -143,6 +147,8 @@ impl<M> FirstConnected<M> {
 		}
 	}
 }
+
+impl<M> bevy_ecs::event::Event for FirstConnected<M> where M: bevy_ecs::event::Event {}
 
 impl<M> PartialEq for FirstConnected<M> {
 	fn eq(&self, other: &Self) -> bool {
