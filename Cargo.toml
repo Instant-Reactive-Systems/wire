@@ -8,16 +8,12 @@ version = "0.1.0"
 [dependencies]
 wire-macros = { path = "wire-macros" }
 thiserror = "1.0"
-bincode = { version = "2.0.0-rc.3", optional = true, default-features = false, features = ["std", "derive"] }
 bevy_ecs = { version = "0.12", default-features = false, features = ["bevy_reflect"] }
-serde = { version = "1.0", optional = true, features = ["derive"] }
+serde = { version = "1.0", features = ["derive"] }
 fluent-templates = { version = "0.9", optional = true }
 uuid = { version = "1.10", default-features = false, features = ["v4"] }
 
 [features]
-# wire protocol
-bincode = ["dep:bincode"]
-serde = ["dep:serde"]
 # localization
 i18n = ["dep:fluent-templates"]
 # wasm

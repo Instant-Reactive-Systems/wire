@@ -24,38 +24,6 @@ impl<M> Connected<M> {
 	}
 }
 
-impl<M> bevy_ecs::event::Event for Connected<M> where M: bevy_ecs::event::Event {}
-
-#[cfg(feature = "bincode")]
-impl<M> bincode::Encode for Connected<M> {
-	fn encode<E: bincode::enc::Encoder>(&self, encoder: &mut E) -> Result<(), bincode::error::EncodeError> {
-		self.user_id.encode(encoder)?;
-		self.session_id.encode(encoder)
-	}
-}
-
-#[cfg(feature = "bincode")]
-impl<M> bincode::Decode for Connected<M> {
-	fn decode<D: bincode::de::Decoder>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
-		Ok(Self {
-			user_id: UserId::decode(decoder)?,
-			session_id: SessionId::decode(decoder)?,
-			_phantom: Default::default(),
-		})
-	}
-}
-
-#[cfg(feature = "bincode")]
-impl<'de, M> bincode::BorrowDecode<'de> for Connected<M> {
-	fn borrow_decode<D: bincode::de::BorrowDecoder<'de>>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
-		Ok(Self {
-			user_id: UserId::borrow_decode(decoder)?,
-			session_id: SessionId::borrow_decode(decoder)?,
-			_phantom: Default::default(),
-		})
-	}
-}
-
 impl<M> PartialEq for Connected<M> {
 	fn eq(&self, other: &Self) -> bool {
 		self.user_id == other.user_id && self.session_id == other.session_id
@@ -114,38 +82,6 @@ impl<M> Disconnected<M> {
 	}
 }
 
-impl<M> bevy_ecs::event::Event for Disconnected<M> where M: bevy_ecs::event::Event {}
-
-#[cfg(feature = "bincode")]
-impl<M> bincode::Encode for Disconnected<M> {
-	fn encode<E: bincode::enc::Encoder>(&self, encoder: &mut E) -> Result<(), bincode::error::EncodeError> {
-		self.user_id.encode(encoder)?;
-		self.session_id.encode(encoder)
-	}
-}
-
-#[cfg(feature = "bincode")]
-impl<M> bincode::Decode for Disconnected<M> {
-	fn decode<D: bincode::de::Decoder>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
-		Ok(Self {
-			user_id: UserId::decode(decoder)?,
-			session_id: SessionId::decode(decoder)?,
-			_phantom: Default::default(),
-		})
-	}
-}
-
-#[cfg(feature = "bincode")]
-impl<'de, M> bincode::BorrowDecode<'de> for Disconnected<M> {
-	fn borrow_decode<D: bincode::de::BorrowDecoder<'de>>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
-		Ok(Self {
-			user_id: UserId::borrow_decode(decoder)?,
-			session_id: SessionId::borrow_decode(decoder)?,
-			_phantom: Default::default(),
-		})
-	}
-}
-
 impl<M> PartialEq for Disconnected<M> {
 	fn eq(&self, other: &Self) -> bool {
 		self.user_id == other.user_id && self.session_id == other.session_id
@@ -201,38 +137,6 @@ impl<M> FirstConnected<M> {
 			session_id,
 			_phantom: Default::default(),
 		}
-	}
-}
-
-impl<M> bevy_ecs::event::Event for FirstConnected<M> where M: bevy_ecs::event::Event {}
-
-#[cfg(feature = "bincode")]
-impl<M> bincode::Encode for FirstConnected<M> {
-	fn encode<E: bincode::enc::Encoder>(&self, encoder: &mut E) -> Result<(), bincode::error::EncodeError> {
-		self.user_id.encode(encoder)?;
-		self.session_id.encode(encoder)
-	}
-}
-
-#[cfg(feature = "bincode")]
-impl<M> bincode::Decode for FirstConnected<M> {
-	fn decode<D: bincode::de::Decoder>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
-		Ok(Self {
-			user_id: UserId::decode(decoder)?,
-			session_id: SessionId::decode(decoder)?,
-			_phantom: Default::default(),
-		})
-	}
-}
-
-#[cfg(feature = "bincode")]
-impl<'de, M> bincode::BorrowDecode<'de> for FirstConnected<M> {
-	fn borrow_decode<D: bincode::de::BorrowDecoder<'de>>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
-		Ok(Self {
-			user_id: UserId::borrow_decode(decoder)?,
-			session_id: SessionId::borrow_decode(decoder)?,
-			_phantom: Default::default(),
-		})
 	}
 }
 

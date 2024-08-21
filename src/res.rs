@@ -3,8 +3,7 @@
 use crate::Targets;
 
 /// An event that occurred in the system directed towards a particular [`Targets`].
-#[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Res<E> {
 	/// The targets that this event is sent to.
 	pub targets: Targets,

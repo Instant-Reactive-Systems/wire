@@ -3,8 +3,7 @@
 use crate::*;
 
 /// A request by a target (anonymous or authenticated) to perform an action.
-#[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Req<A> {
 	/// The target that sent the request.
 	pub from: Target,

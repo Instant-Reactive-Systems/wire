@@ -1,57 +1,6 @@
 //! Module containing the target types.
 
-/// A wrapper around a Uuid providing bincode support.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-pub struct Uuid(uuid::Uuid);
-
-impl Uuid {
-	/// A nil uuid.
-	pub const fn nil() -> Self {
-		Self(uuid::Uuid::nil())
-	}
-
-	/// Generates a new random uuidv4.
-	pub fn new_random() -> Self {
-		Self(uuid::Uuid::new_v4())
-	}
-
-	/// Creates a new specific uuidv4 from a u64 pair.
-	pub const fn from_u64_pair(high: u64, low: u64) -> Self {
-		Self(uuid::Uuid::from_u64_pair(high, low))
-	}
-}
-
-impl std::fmt::Display for UserId {
-	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-		self.0.as_hyphenated().fmt(f)
-	}
-}
-
-#[cfg(feature = "bincode")]
-impl bincode::Encode for UserId {
-	fn encode<E: bincode::enc::Encoder>(&self, encoder: &mut E) -> Result<(), bincode::error::EncodeError> {
-		self.0.as_bytes().encode(encoder)
-	}
-}
-
-#[cfg(feature = "bincode")]
-impl bincode::Decode for UserId {
-	fn decode<D: bincode::de::Decoder>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
-		let user_id = <[u8; 16]>::decode(decoder)?;
-		let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
-		Ok(Self(user_id))
-	}
-}
-
-#[cfg(feature = "bincode")]
-impl<'de> bincode::BorrowDecode<'de> for UserId {
-	fn borrow_decode<D: bincode::de::BorrowDecoder<'de>>(decoder: &mut D) -> Result<Self, bincode::error::DecodeError> {
-		let user_id = <[u8; 16]>::borrow_decode(decoder)?;
-		let user_id = uuid::Uuid::from_slice(&user_id).map_err(|err| bincode::error::DecodeError::OtherString(format!("{:?}", err)))?;
-		Ok(Self(user_id))
-	}
-}
+pub use uuid::Uuid;
 
 /// The user ID type.
 pub type UserId = Uuid;
@@ -63,9 +12,7 @@ pub type CorrelationId = Uuid;
 pub const ANON_USER_ID: UserId = UserId::nil();
 
 /// An enum representing an authenticated target.
-#[derive(bevy_ecs::prelude::Event, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(bevy_ecs::prelude::Event, Debug, serde::Serialize, serde::Deserialize, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum AuthTarget {
 	/// Targets all sessions of a user.
 	All(UserId),
@@ -92,9 +39,7 @@ impl Into<Target> for AuthTarget {
 /// An enum representing a target.
 ///
 /// A target can be either a source or a destination of a particular message.
-#[derive(bevy_ecs::prelude::Event, Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(bevy_ecs::prelude::Event, Debug, serde::Serialize, serde::Deserialize, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Target {
 	/// Targets an anonymous session.
 	Anon(SessionId),
@@ -118,7 +63,7 @@ impl Target {
 	///
 	/// Useful in cases of testing.
 	pub fn new_random() -> Self {
-		let user_id = UserId::new_random();
+		let user_id = UserId::new_v4();
 		Self::Auth(AuthTarget::Specific(user_id, 0))
 	}
 
@@ -126,7 +71,7 @@ impl Target {
 	///
 	/// Useful in cases of testing.
 	pub fn new_random_with_session(session_id: SessionId) -> Self {
-		let user_id = UserId::new_random();
+		let user_id = UserId::new_v4();
 		Self::Auth(AuthTarget::Specific(user_id, session_id))
 	}
 
@@ -203,9 +148,7 @@ impl Into<Targets> for Vec<AuthTarget> {
 }
 
 /// The targets that a message can be sent to.
-#[derive(bevy_ecs::prelude::Event, Debug, Clone, PartialEq, Eq)]
-#[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(bevy_ecs::prelude::Event, Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq)]
 pub enum Targets {
 	/// Targets all sessions.
 	All,
@@ -214,6 +157,8 @@ pub enum Targets {
 }
 
 /// An endless (u64-endless) pool of `Target`s.
+///
+/// Useful in testing.
 #[derive(Debug, Clone, Copy)]
 pub struct UserPool {
 	curr: u64,

@@ -5,9 +5,7 @@ use crate::{CorrelationId, Target};
 /// An error directed to a specific target.
 ///
 /// Uses a correlation ID to correlate the error to a request.
-#[derive(thiserror::Error, Debug)]
-#[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(thiserror::Error, Debug, serde::Serialize, serde::Deserialize)]
 #[error("error '{error}' directed to player '{to:?}'")]
 pub struct Error<E> {
 	/// The target.
@@ -77,9 +75,7 @@ impl<E> Into<Vec<Error<E>>> for Error<E> {
 /// 	// ... other variants
 /// }
 /// ```
-#[derive(thiserror::Error, bevy_ecs::prelude::Event, Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(thiserror::Error, bevy_ecs::prelude::Event, Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq, Hash)]
 pub enum SessionError {
 	/// The maximum number of sessions reached.
 	#[error("wire-err-max_reached")]
@@ -105,9 +101,7 @@ pub enum SessionError {
 /// 	// ... other variants
 /// }
 /// ```
-#[derive(thiserror::Error, bevy_ecs::prelude::Event, Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "bincode", derive(bincode::Encode, bincode::Decode))]
-#[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
+#[derive(thiserror::Error, bevy_ecs::prelude::Event, Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq, Hash)]
 pub enum NetworkError {
 	/// The user has been rate-limited.
 	#[error("wire-err-rate_limited")]
