@@ -27,7 +27,7 @@ pub mod error;
 pub use error::{Error, NetworkError, SessionError};
 
 pub mod events;
-pub use events::{Connected, Disconnected, FirstConnected};
+pub use events::{Connected, Disconnected, FirstConnected, Undetermined};
 
 pub mod req;
 pub use req::Req;
