@@ -16,8 +16,6 @@ pub struct Error<E> {
 	pub corrid: CorrelationId,
 }
 
-impl<E> bevy_ecs::event::Event for Error<E> where E: bevy_ecs::event::Event {}
-
 impl<E> Error<E> {
 	/// Creates a new directed error.
 	pub fn new(to: impl Into<Target>, error: impl Into<E>, corrid: CorrelationId) -> Self {
@@ -72,7 +70,7 @@ impl<E> Into<Vec<Error<E>>> for Error<E> {
 /// 	// ... other variants
 /// }
 /// ```
-#[derive(thiserror::Error, bevy_ecs::prelude::Event, Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq, Hash)]
+#[derive(thiserror::Error, Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq, Hash)]
 pub enum SessionError {
 	/// The maximum number of sessions reached.
 	#[error("wire-err-max_reached")]
@@ -98,7 +96,7 @@ pub enum SessionError {
 /// 	// ... other variants
 /// }
 /// ```
-#[derive(thiserror::Error, bevy_ecs::prelude::Event, Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq, Hash)]
+#[derive(thiserror::Error, Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq, Hash)]
 pub enum NetworkError {
 	/// The user has been rate-limited.
 	#[error("wire-err-rate_limited")]

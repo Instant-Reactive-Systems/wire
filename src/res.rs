@@ -21,8 +21,6 @@ impl<E> Res<E> {
 	}
 }
 
-impl<E> bevy_ecs::event::Event for Res<E> where E: bevy_ecs::event::Event {}
-
 impl<E> PartialEq for Res<E>
 where
 	E: PartialEq,

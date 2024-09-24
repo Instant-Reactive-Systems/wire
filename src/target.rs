@@ -12,7 +12,7 @@ pub type CorrelationId = Uuid;
 pub const ANON_USER_ID: UserId = UserId::nil();
 
 /// An enum representing an authenticated target.
-#[derive(bevy_ecs::prelude::Event, Debug, serde::Serialize, serde::Deserialize, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum AuthTarget {
 	/// Targets all sessions of a user.
 	All(UserId),
@@ -39,7 +39,7 @@ impl Into<Target> for AuthTarget {
 /// An enum representing a target.
 ///
 /// A target can be either a source or a destination of a particular message.
-#[derive(bevy_ecs::prelude::Event, Debug, serde::Serialize, serde::Deserialize, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Target {
 	/// Targets an anonymous session.
 	Anon(SessionId),
@@ -148,7 +148,7 @@ impl Into<Targets> for Vec<AuthTarget> {
 }
 
 /// The targets that a message can be sent to.
-#[derive(bevy_ecs::prelude::Event, Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq)]
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq)]
 pub enum Targets {
 	/// Targets all sessions.
 	All,

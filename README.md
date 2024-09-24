@@ -26,5 +26,5 @@ fn main() {
 
 ```toml
 [dependencies]
-wire = { git = "https://github.com/Instant-Reactive-Systems/wire.git" }
+wire = { git = "ssh://git@github.com/Instant-Reactive-Systems/wire.git" }
 ```
