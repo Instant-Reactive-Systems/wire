@@ -24,8 +24,6 @@ impl<A> Req<A> {
 	}
 }
 
-impl<A> bevy_ecs::event::Event for Req<A> where A: bevy_ecs::event::Event {}
-
 impl<A> PartialEq for Req<A>
 where
 	A: PartialEq,

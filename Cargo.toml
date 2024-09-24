@@ -8,10 +8,9 @@ version = "0.1.0"
 [dependencies]
 wire-macros = { path = "wire-macros" }
 thiserror = "1.0"
-bevy_ecs = { version = "0.12", default-features = false, features = ["bevy_reflect"] }
 serde = { version = "1.0", features = ["derive"] }
 fluent-templates = { version = "0.10", optional = true }
-uuid = { version = "1.10", default-features = false, features = ["v4"] }
+uuid = { version = "1.10", default-features = false, features = ["v4", "serde"] }
 
 [features]
 # localization
