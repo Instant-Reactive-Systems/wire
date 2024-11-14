@@ -2,6 +2,14 @@
 
 use crate::*;
 
+/// Event indicating that a user was authenticated.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct Authenticated;
+
+/// Event indicating that a user was unauthenticated.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+pub struct Unauthenticated;
+
 /// Marker type of a connection event that hasn't been mapped into any category yet.
 #[derive(Debug, Clone, Copy)]
 pub struct Undetermined;
