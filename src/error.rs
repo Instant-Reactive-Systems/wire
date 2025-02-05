@@ -83,6 +83,18 @@ pub enum SessionError {
 	Unauthenticated,
 }
 
+#[cfg(feature = "i18n")]
+impl i18n::LocalizedDisplay for SessionError {
+	fn localize(&self, lang: &i18n::LanguageIdentifier) -> String {
+		use fluent_templates::Loader;
+		match self {
+			Self::MaximumSessionsReached => crate::i18n::LOCALE.lookup(lang, "wire-err-max_reached"),
+			Self::NoSuchSession => crate::i18n::LOCALE.lookup(lang, "wire-err-no_such_session"),
+			Self::Unauthenticated => crate::i18n::LOCALE.lookup(lang, "wire-err-unauth"),
+		}
+	}
+}
+
 /// A network error.
 ///
 /// # Usage
@@ -107,4 +119,20 @@ pub enum NetworkError {
 	/// Socket error.
 	#[error("wire-err-socket_error")]
 	SocketError(String),
+}
+
+#[cfg(feature = "i18n")]
+impl i18n::LocalizedDisplay for NetworkError {
+	fn localize(&self, lang: &i18n::LanguageIdentifier) -> String {
+		use fluent_templates::{Loader, fluent_bundle::FluentValue};
+		match self {
+			Self::RateLimited => crate::i18n::LOCALE.lookup(lang, "wire-err-max_reached"),
+			Self::InvalidMessage => crate::i18n::LOCALE.lookup(lang, "wire-err-no_such_session"),
+			Self::SocketError(msg) => crate::i18n::LOCALE.lookup_with_args(lang, "wire-err-unauth", &{
+				let mut args = std::collections::HashMap::default();
+				args.insert("what".to_string(), FluentValue::from(msg));
+				args
+			}),
+		}
+	}
 }

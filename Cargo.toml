@@ -9,11 +9,13 @@ version = "0.1.0"
 wire-macros = { path = "wire-macros" }
 thiserror = "1.0"
 serde = { version = "1.0", features = ["derive"] }
-fluent-templates = { version = "0.12", optional = true }
 uuid = { version = "1.10", default-features = false, features = ["v4", "serde"] }
+# localization
+i18n = { git = "ssh://git@github.com/Instant-Reactive-Systems/i18n.git", optional = true }
+fluent-templates = { version = "0.12", optional = true }
 
 [features]
 # localization
-i18n = ["dep:fluent-templates"]
+i18n = ["dep:fluent-templates", "dep:i18n"]
 # wasm
 wasm = ["uuid/js"]
