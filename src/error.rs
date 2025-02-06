@@ -130,7 +130,7 @@ impl i18n::LocalizedDisplay for NetworkError {
 			Self::InvalidMessage => crate::i18n::LOCALE.lookup(lang, "wire-err-no_such_session"),
 			Self::SocketError(msg) => crate::i18n::LOCALE.lookup_with_args(lang, "wire-err-unauth", &{
 				let mut args = std::collections::HashMap::default();
-				args.insert("what".to_string(), FluentValue::from(msg));
+				args.insert("what".into(), FluentValue::from(msg));
 				args
 			}),
 		}
