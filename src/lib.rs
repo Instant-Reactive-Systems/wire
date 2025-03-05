@@ -34,7 +34,7 @@ pub mod req;
 pub use req::Req;
 
 pub mod res;
-pub use res::Res;
+pub use res::{Res, TimestampedEvent};
 
 pub mod target;
 pub use target::{AuthTarget, CorrelationId, SessionId, Target, Targets, UserId, UserPool, Uuid, ANON_USER_ID};
