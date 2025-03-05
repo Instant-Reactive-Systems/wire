@@ -77,6 +77,18 @@ impl<E> TimestampedEvent<E> {
 	}
 }
 
+impl<E> Default for TimestampedEvent<E>
+where
+	E: Default,
+{
+	fn default() -> Self {
+		Self {
+			timestamp: chrono::Utc::now().timestamp_millis(),
+			event: Default::default(),
+		}
+	}
+}
+
 impl<E> PartialEq for TimestampedEvent<E>
 where
 	E: PartialEq,
