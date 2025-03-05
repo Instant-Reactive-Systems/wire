@@ -11,6 +11,16 @@ pub struct Res<E> {
 	pub event: TimestampedEvent<E>,
 }
 
+impl<E> Res<E> {
+	/// Creates a new response.
+	pub fn new(targets: impl Into<Targets>, event: impl Into<E>) -> Self {
+		Self {
+			targets: targets.into(),
+			event: TimestampedEvent::new(event),
+		}
+	}
+}
+
 impl<E> PartialEq for Res<E>
 where
 	E: PartialEq,
