@@ -59,6 +59,7 @@ impl<E> Into<Vec<Res<E>>> for Res<E> {
 	}
 }
 
+/// A timestamped event that occurred in the system directed towards a particular [`Targets`].
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct TimestampedEvent<E> {
 	/// The timestamp of when the event occurred (in ms).
