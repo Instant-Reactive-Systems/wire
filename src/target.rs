@@ -111,7 +111,7 @@ impl Target {
 	/// Converts a specific target into a target targetting all user sessions.
 	pub fn for_all(&self) -> Target {
 		match self {
-			Target::Anon(_) => panic!("Target::for_all() called on Anon target"),
+			Target::Anon(_) => self.clone(),
 			Target::Auth(auth_target) => Target::Auth(AuthTarget::All(auth_target.id())),
 		}
 	}
