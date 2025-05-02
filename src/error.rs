@@ -73,13 +73,13 @@ impl<E> Into<Vec<Error<E>>> for Error<E> {
 #[derive(thiserror::Error, Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq, Hash)]
 pub enum SessionError {
 	/// The maximum number of sessions reached.
-	#[error("wire-err-max_reached")]
+	#[error("The maximum number of sessions reached.")]
 	MaximumSessionsReached,
 	/// The session does not exist.
-	#[error("wire-err-no_such")]
+	#[error("The session does not exist.")]
 	NoSuchSession,
 	/// The user is not authenticated.
-	#[error("wire-err-unauth")]
+	#[error("The user is not authenticated.")]
 	Unauthenticated,
 }
 
@@ -111,13 +111,13 @@ impl i18n::LocalizedDisplay for SessionError {
 #[derive(thiserror::Error, Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq, Hash)]
 pub enum NetworkError {
 	/// The user has been rate-limited.
-	#[error("wire-err-rate_limited")]
+	#[error("The user has been rate-limited.")]
 	RateLimited,
 	/// Invalid message received.
-	#[error("wire-err-invalid_msg")]
+	#[error("Invalid message received.")]
 	InvalidMessage,
 	/// Socket error.
-	#[error("wire-err-socket_error")]
+	#[error("Socket error.")]
 	SocketError(String),
 }
 
