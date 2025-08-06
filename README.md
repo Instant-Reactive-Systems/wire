@@ -1,5 +1,5 @@
 # wire
-A facade and utility crate for an action-and-event sessions-based on-the-wire communication.
+A facade crate for a unified way of declaring a action-event-error protocol with internal request correlation tracking. Used for real-time communication via sockets.
 
 Provides `Req`, `Res` and `Error` as a generic API for req-res communication.
 Also provides a utility macro for implementing actions and events for use with communication.
