@@ -8,5 +8,5 @@ Also provides a utility macro for implementing actions and events for use with c
 
 ```toml
 [dependencies]
-wire = { git = "ssh://git@github.com/Instant-Reactive-Systems/wire.git" }
+wire = { git = "https://github.com/Instant-Reactive-Systems/wire.git" }
 ```
