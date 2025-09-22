@@ -13,10 +13,9 @@ uuid = { version = "1.10", default-features = false, features = ["v4", "serde"] 
 chrono = "0.4"
 # localization
 i18n = { git = "https://github.com/Instant-Reactive-Systems/i18n.git", optional = true }
-fluent-templates = { version = "0.12", optional = true }
 
 [features]
 # localization
-i18n = ["dep:fluent-templates", "dep:i18n"]
+i18n = ["dep:i18n"]
 # wasm
 wasm = ["uuid/js"]

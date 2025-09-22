@@ -1,10 +1,10 @@
 
 # session errors
-wire-err-max_reached = Najveći broj sesija je dosegnut
-wire-err-no_such = Sesija ne postoji
-wire-err-unauth = Niste ulogirani
+session-err-max_reached = Najveći broj sesija je dosegnut
+session-err-no_such_session = Sesija ne postoji
+session-err-unauth = Niste ulogirani
 
 # network errors
-wire-err-rate_limited = Vaše radnje su ograničene brzinom
-wire-err-invalid_msg = Poruka nije validna
-wire-err-socket_error = Greška na socketu: {$what}
+network-err-rate_limited = Vaše radnje su ograničene brzinom
+network-err-invalid_msg = Poruka nije validna
+network-err-socket_error = Greška na socketu: {$what}

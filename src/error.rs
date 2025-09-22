@@ -85,13 +85,14 @@ pub enum SessionError {
 
 #[cfg(feature = "i18n")]
 impl i18n::LocalizedDisplay for SessionError {
-	fn localize(&self, lang: &i18n::LanguageIdentifier) -> String {
-		use fluent_templates::Loader;
-		match self {
-			Self::MaximumSessionsReached => crate::i18n::LOCALE.lookup(lang, "wire-err-max_reached"),
-			Self::NoSuchSession => crate::i18n::LOCALE.lookup(lang, "wire-err-no_such_session"),
-			Self::Unauthenticated => crate::i18n::LOCALE.lookup(lang, "wire-err-unauth"),
-		}
+	fn localize(&self, lang: &i18n::LanguageIdentifier) -> i18n::Message {
+		let id = match self {
+			Self::MaximumSessionsReached => "session-err-max_reached",
+			Self::NoSuchSession => "session-err-no_such_session",
+			Self::Unauthenticated => "session-err-unauth",
+		};
+
+		crate::i18n::LOCALES.query(lang, &i18n::Query::new(id).with_fallback(true)).unwrap()
 	}
 }
 
@@ -123,16 +124,14 @@ pub enum NetworkError {
 
 #[cfg(feature = "i18n")]
 impl i18n::LocalizedDisplay for NetworkError {
-	fn localize(&self, lang: &i18n::LanguageIdentifier) -> String {
-		use fluent_templates::{Loader, fluent_bundle::FluentValue};
-		match self {
-			Self::RateLimited => crate::i18n::LOCALE.lookup(lang, "wire-err-max_reached"),
-			Self::InvalidMessage => crate::i18n::LOCALE.lookup(lang, "wire-err-no_such_session"),
-			Self::SocketError(msg) => crate::i18n::LOCALE.lookup_with_args(lang, "wire-err-unauth", &{
-				let mut args = std::collections::HashMap::default();
-				args.insert("what".into(), FluentValue::from(msg));
-				args
-			}),
-		}
+	fn localize(&self, lang: &i18n::LanguageIdentifier) -> i18n::Message {
+		use crate::i18n::LOCALES;
+		let id = match self {
+			Self::RateLimited => "network-err-max_reached",
+			Self::InvalidMessage => "network-err-no_such_session",
+			Self::SocketError(msg) => return i18n::tr!(lang, "network-err-unauth", what = msg),
+		};
+
+		crate::i18n::LOCALES.query(lang, &i18n::Query::new(id).with_fallback(true)).unwrap()
 	}
 }
