@@ -142,6 +142,14 @@ impl Target {
 			Target::Bot(..) => self.clone(),
 		}
 	}
+
+	/// Returns the target's user ID if it has one.
+	pub fn user_id(&self) -> Option<UserId> {
+		match self {
+			Target::Auth(auth_target) => Some(auth_target.id()),
+			_ => None,
+		}
+	}
 }
 
 impl From<(UserId, SessionId)> for Target {
@@ -205,22 +213,22 @@ pub struct UserPool {
 }
 
 impl UserPool {
-	/// An anonymous user.
-	pub fn anon(&mut self) -> Target {
+	/// Selects the next unique anon target from the user pool.
+	pub fn next_anon(&mut self) -> Target {
 		let n = self.curr;
 		self.curr += 1;
 		Target::new_anon(n)
 	}
 
-	/// A bot.
-	pub fn bot(&mut self) -> Target {
+	/// Selects the next unique bot target from the user pool.
+	pub fn next_bot(&mut self) -> Target {
 		let n = self.curr;
 		self.curr += 1;
 		Target::new_bot(Uuid::from_u64_pair(n as u64, n as u64))
 	}
 
-	/// Selects the next unique target from the user pool.
-	pub fn next(&mut self) -> Target {
+	/// Selects the next unique auth target from the user pool.
+	pub fn next_auth(&mut self) -> Target {
 		let n = self.curr;
 		self.curr += 1;
 		Target::new_auth_specific(Uuid::from_u64_pair(n as u64, n as u64), 0)
@@ -229,6 +237,6 @@ impl UserPool {
 
 impl Default for UserPool {
 	fn default() -> Self {
-		Self { curr: 1 } // 0 is reserved for anon users
+		Self { curr: 0 }
 	}
 }
