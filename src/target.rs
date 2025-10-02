@@ -237,6 +237,6 @@ impl UserPool {
 
 impl Default for UserPool {
 	fn default() -> Self {
-		Self { curr: 0 }
+		Self { curr: 1 } // 0 is reserved for anon users
 	}
 }
