@@ -129,7 +129,7 @@ impl i18n::LocalizedDisplay for NetworkError {
 		let id = match self {
 			Self::RateLimited => "network-err-max_reached",
 			Self::InvalidMessage => "network-err-no_such_session",
-			Self::SocketError(msg) => return i18n::tr!(lang, "network-err-unauth", what = msg),
+			Self::SocketError(msg) => return i18n::tr!(lang, "network-err-unauth", "what" = msg),
 		};
 
 		crate::i18n::LOCALES.query(lang, &i18n::Query::new(id).with_fallback(true)).unwrap()
