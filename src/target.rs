@@ -174,6 +174,19 @@ impl Into<Targets> for Vec<AuthTarget> {
 	}
 }
 
+impl std::fmt::Display for Target {
+	fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+		match self {
+			Self::Anon(session_id) => write!(f, "anon/{session_id}"),
+			Self::Auth(auth_target) => match auth_target {
+				AuthTarget::All(user_id) => write!(f, "auth/{user_id}"),
+				AuthTarget::Specific(user_id, session_id) => write!(f, "auth/{user_id}/{session_id}"),
+			},
+			Self::Bot(bot_id) => write!(f, "bot/{bot_id}"),
+		}
+	}
+}
+
 /// The targets that a message can be sent to.
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone, PartialEq, Eq)]
 pub enum Targets {
