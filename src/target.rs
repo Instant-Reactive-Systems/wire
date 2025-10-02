@@ -6,6 +6,8 @@ pub use uuid::Uuid;
 pub type UserId = Uuid;
 /// The session ID type.
 pub type SessionId = u32;
+/// The bot ID type.
+pub type BotId = Uuid;
 /// The correlation ID type.
 pub type CorrelationId = Uuid;
 /// The user ID of an anonymous target.
@@ -45,12 +47,15 @@ pub enum Target {
 	Anon(SessionId),
 	/// Targets an authenticated session.
 	Auth(AuthTarget),
+	/// Targets a bot.
+	Bot(BotId),
 }
 
 impl Target {
 	/// Creates a [`Target`] from a user ID and a session ID.
 	///
 	/// It creates either an anonymous target (if `user_id == ANONYMOUS_USER_ID`) or an authenticated specific target.
+	#[deprecated = "Replaced by more clear and intentional methods."]
 	pub fn new(user_id: UserId, session_id: SessionId) -> Self {
 		if user_id == ANON_USER_ID {
 			Self::Anon(session_id)
@@ -75,20 +80,33 @@ impl Target {
 		Self::Auth(AuthTarget::Specific(user_id, session_id))
 	}
 
+	/// A specific authenticated target.
+	pub fn new_auth_specific(user_id: UserId, session_id: SessionId) -> Self {
+		Self::Auth(AuthTarget::Specific(user_id, session_id))
+	}
+
+	/// An authenticated target.
+	pub fn new_auth(user_id: UserId) -> Self {
+		Self::Auth(AuthTarget::All(user_id))
+	}
+
+	/// An anonymous target.
+	pub fn new_anon(session_id: SessionId) -> Self {
+		Self::Anon(session_id)
+	}
+
+	/// A bot target.
+	pub fn new_bot(bot_id: BotId) -> Self {
+		Self::Bot(bot_id)
+	}
+
 	/// Checks whether the two targets are equal, allowing for same broader authenticated targets to also be equal.
 	pub fn weak_eq(&self, other: &Self) -> bool {
 		match (self, other) {
-			(Self::Anon(session_id), Self::Anon(other_session_id)) => session_id == other_session_id,
+			(Self::Anon(a), Self::Anon(b)) => a == b,
 			(Self::Auth(a), Self::Auth(b)) => a.id() == b.id(),
+			(Self::Bot(a), Self::Bot(b)) => a == b,
 			_ => false,
-		}
-	}
-
-	/// Returns the user ID of the target.
-	pub fn id(&self) -> UserId {
-		match self {
-			Self::Anon(_) => ANON_USER_ID,
-			Self::Auth(auth) => auth.id(),
 		}
 	}
 
@@ -108,18 +126,27 @@ impl Target {
 		}
 	}
 
+	/// Checks whether the target is a bot target.
+	pub fn is_bot(&self) -> bool {
+		match self {
+			Self::Bot(_) => true,
+			_ => false,
+		}
+	}
+
 	/// Converts a specific target into a target targetting all user sessions.
 	pub fn for_all(&self) -> Target {
 		match self {
-			Target::Anon(_) => self.clone(),
+			Target::Anon(..) => self.clone(),
 			Target::Auth(auth_target) => Target::Auth(AuthTarget::All(auth_target.id())),
+			Target::Bot(..) => self.clone(),
 		}
 	}
 }
 
 impl From<(UserId, SessionId)> for Target {
 	fn from((user_id, session_id): (UserId, SessionId)) -> Self {
-		Self::new(user_id, session_id)
+		Self::new_auth_specific(user_id, session_id)
 	}
 }
 
@@ -156,20 +183,34 @@ pub enum Targets {
 	Few(Vec<Target>),
 }
 
-/// An endless (u64-endless) pool of `Target`s.
+/// An endless (u32-endless) pool of `Target`s.
 ///
 /// Useful in testing.
 #[derive(Debug, Clone, Copy)]
 pub struct UserPool {
-	curr: u64,
+	curr: u32,
 }
 
 impl UserPool {
+	/// An anonymous user.
+	pub fn anon(&mut self) -> Target {
+		let n = self.curr;
+		self.curr += 1;
+		Target::new_anon(n)
+	}
+
+	/// A bot.
+	pub fn bot(&mut self) -> Target {
+		let n = self.curr;
+		self.curr += 1;
+		Target::new_bot(Uuid::from_u64_pair(n as u64, n as u64))
+	}
+
 	/// Selects the next unique target from the user pool.
 	pub fn next(&mut self) -> Target {
 		let n = self.curr;
 		self.curr += 1;
-		Target::new(Uuid::from_u64_pair(n, n), 0)
+		Target::new_auth_specific(Uuid::from_u64_pair(n as u64, n as u64), 0)
 	}
 }
 
