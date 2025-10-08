@@ -80,6 +80,15 @@ impl Target {
 		Self::Auth(AuthTarget::Specific(user_id, session_id))
 	}
 
+	/// An anonymous or authenticated specific target, depending on the user ID.
+	pub fn new_deduced(user_id: UserId, session_id: SessionId) -> Self {
+		if user_id == ANON_USER_ID {
+			Self::new_anon(session_id)
+		} else {
+			Self::new_auth_specific(user_id, session_id)
+		}
+	}
+
 	/// A specific authenticated target.
 	pub fn new_auth_specific(user_id: UserId, session_id: SessionId) -> Self {
 		Self::Auth(AuthTarget::Specific(user_id, session_id))
