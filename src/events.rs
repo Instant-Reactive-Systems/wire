@@ -190,31 +190,19 @@ impl<M> Copy for FirstConnected<M> {}
 
 impl<M> From<Connected<M>> for Target {
 	fn from(value: Connected<M>) -> Self {
-		if value.user_id == ANON_USER_ID {
-			Target::Anon(value.session_id)
-		} else {
-			Target::Auth(AuthTarget::Specific(value.user_id, value.session_id))
-		}
+		Self::new_deduced(value.user_id, value.session_id)
 	}
 }
 
 impl<M> From<Disconnected<M>> for Target {
 	fn from(value: Disconnected<M>) -> Self {
-		if value.user_id == ANON_USER_ID {
-			Target::Anon(value.session_id)
-		} else {
-			Target::Auth(AuthTarget::Specific(value.user_id, value.session_id))
-		}
+		Self::new_deduced(value.user_id, value.session_id)
 	}
 }
 
 impl<M> From<FirstConnected<M>> for Target {
 	fn from(value: FirstConnected<M>) -> Self {
-		if value.user_id == ANON_USER_ID {
-			Target::Anon(value.session_id)
-		} else {
-			Target::Auth(AuthTarget::Specific(value.user_id, value.session_id))
-		}
+		Self::new_deduced(value.user_id, value.session_id)
 	}
 }
 
